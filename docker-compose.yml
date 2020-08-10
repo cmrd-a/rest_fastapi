@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  postgres:
+    container_name: rest_fastapi_postgres
+    image: postgres:12.3-alpine
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+  fastapi:
+    container_name: rest_fastapi_fastapi
+    build: .
+    command: ["./wait-for-it.sh", "postgres:5432", "--", "uvicorn","--host=0.0.0.0", "app.main:app"]
+    volumes:
+      - ./:/opt/rest_fastapi
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+volumes:
+  pg_data:
